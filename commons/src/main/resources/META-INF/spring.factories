@@ -1,0 +1,3 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.labijie.application.iot.configuration.IotCommonsAutoConfiguration,\
+  com.labijie.application.iot.configuration.MQTTAutoConfiguration
