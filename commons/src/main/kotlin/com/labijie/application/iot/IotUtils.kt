@@ -1,15 +1,15 @@
 package com.labijie.application.iot
 
-import java.net.URI
-import kotlin.random.Random
-
 object IotUtils {
     const val LISTENER_PROTOCOL_MQTT = "mqtt"
-    const val LISTENER_PROTOCOL_MQTT_WEB_SOCKET = "mqttws"
+    const val LISTENER_PROTOCOL_MQTT_WS = "mqttws"
+
+
+    const val MQTT_SERVER_PROVIDER_VERNEMQ = "vernemq"
 
     fun isSupportProtocol(protocol: String): Boolean {
         return when (protocol) {
-            LISTENER_PROTOCOL_MQTT, LISTENER_PROTOCOL_MQTT -> true
+            LISTENER_PROTOCOL_MQTT, LISTENER_PROTOCOL_MQTT_WS -> true
             else -> false
         }
     }

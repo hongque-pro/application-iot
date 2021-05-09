@@ -1,0 +1,44 @@
+{
+  "properties": [
+    {
+      "name": "application.iot.mqtt.server-provider",
+      "defaultValue": "vernemq"
+    },
+    {
+      "name": "application.iot.mqtt.enabled",
+      "defaultValue": true
+    },
+    {
+      "name": "application.iot.mqtt.version",
+      "defaultValue": "5.0"
+    },
+    {
+      "name": "application.iot.mqtt.vernemq.http-url",
+      "defaultValue": "http://localhost:8888"
+    }
+  ],
+  "hints": [
+    {
+      "name": "application.iot.mqtt.server-provider",
+      "values": [
+        {
+          "value": "vernemq",
+          "description": "verneMQ as the mqtt server."
+        }
+      ]
+    },
+    {
+      "name": "application.iot.mqtt.version",
+      "values": [
+        {
+          "value": "5.0",
+          "description": "mqtt version 5.0."
+        },
+        {
+          "value": "3.1.1",
+          "description": "mqtt version 5.0."
+        }
+      ]
+    }
+  ]
+}

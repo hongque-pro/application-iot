@@ -16,7 +16,7 @@ class LoopList<T : Any>(private val list: List<T>, private val loopPolicy: LoopP
             return null
         }
 
-        if(list.size == 1){
+        if (list.size == 1) {
             currentIndex = 0
             return list[0]
         }
@@ -28,16 +28,14 @@ class LoopList<T : Any>(private val list: List<T>, private val loopPolicy: LoopP
                     nextIndex = if (loopPolicy == LoopPolicy.Sequence) {
                         0
                     } else {
-                        Random.nextInt(0, list.size - 1)
+                        Random.nextInt(0, list.size)
                     }
-                    currentIndex == nextIndex
+                    currentIndex = nextIndex
                 }
             }
-        }
-
-        if (nextIndex < 0) {
+        } else {
             synchronized(syncRoot) {
-                nextIndex = currentIndex++
+                nextIndex = ++currentIndex
                 currentIndex = if (nextIndex < list.size) {
                     nextIndex
                 } else {
@@ -56,7 +54,7 @@ class LoopList<T : Any>(private val list: List<T>, private val loopPolicy: LoopP
             return this.next()
         }
 
-        if (list.size == 1){
+        if (list.size == 1) {
             return list[0]
         }
 
@@ -67,8 +65,7 @@ class LoopList<T : Any>(private val list: List<T>, private val loopPolicy: LoopP
 
     fun <R> loop(action: (item: T) -> R?): R? {
         if (list.isNotEmpty()) {
-            var count = 0
-            while (count < list.size) {
+            repeat(list.size){
                 val item = this.next()
                 if (item == null) {
                     return null
@@ -78,7 +75,6 @@ class LoopList<T : Any>(private val list: List<T>, private val loopPolicy: LoopP
                         return r
                     }
                 }
-                count++
             }
         }
         return null
