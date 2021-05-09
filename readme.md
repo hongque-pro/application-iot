@@ -6,7 +6,7 @@
 
 封装常用 IOT 技术, 目前实现:
 
-- [x] MQTT Client
+- [x] MQTT Client (自动断线重连，自动切换不可用节点)
 
 ## Commons
 
