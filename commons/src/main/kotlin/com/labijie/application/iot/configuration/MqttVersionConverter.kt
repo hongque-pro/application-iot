@@ -21,14 +21,6 @@ class MqttVersionConverter : Converter<Any, MqttVersion> {
         if (source is Double) {
             v = when (source) {
                 5.0 -> MqttVersion.V5_0
-                3.1 -> MqttVersion.V3_1_1
-                else -> null
-            }
-        }
-
-        if (source is Int) {
-            v = when (source) {
-                5 -> MqttVersion.V5_0
                 else -> null
             }
         }
