@@ -1,4 +1,4 @@
-# Application IOT 文档目录
+# Application IOT
 
 ![maven central version](https://img.shields.io/maven-central/v/com.labijie.application/iot-commons?style=flat-square)
 ![workflow status](https://img.shields.io/github/workflow/status/hongque-pro/application-iot/Gradle%20Build%20And%20Release?label=CI%20publish&style=flat-square)
@@ -17,6 +17,21 @@ dependencies {
 ```
 
 ### MQTT Client 
+
+简单配置 (VerneMQ 服务器)：
+
+```yaml
+application:
+  iot:
+    mqtt:
+      user: u
+      password: p
+      version: 5.0
+      keep-alive: 1m
+      vernemq:
+        http-url: http://localhost:8888
+        api-key: XXXXXXXXX
+```
 
 直接通过 Spring 注入 **IMqttClient**
 
