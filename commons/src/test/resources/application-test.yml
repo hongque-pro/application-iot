@@ -5,6 +5,7 @@ application:
       password: p
       version: 5.0
       keep-alive: 1m
+      provider: vernemq
       vernemq:
         http-url: http://47.100.188.60:8888
         api-key: 2a6gDMIx3CZamjtJoP4P1WNGSvyGBQfO

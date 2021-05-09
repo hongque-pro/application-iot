@@ -24,6 +24,7 @@ dependencies {
 application:
   iot:
     mqtt:
+      server-provider: vernemq
       user: u
       password: p
       version: 5.0

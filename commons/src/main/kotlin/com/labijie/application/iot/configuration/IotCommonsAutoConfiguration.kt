@@ -11,8 +11,8 @@ class IotCommonsAutoConfiguration {
 
     @Bean
     @ConfigurationPropertiesBinding
-    fun stringToMqttVersionConverter(): StringToMqttVersionConverter {
-        return StringToMqttVersionConverter()
+    fun mqttVersionConverter(): MqttVersionConverter {
+        return MqttVersionConverter()
     }
 
 }

@@ -23,6 +23,6 @@ class IotServerPropertiesTester {
 
     @Test
     fun testMqttVersionConverter() {
-        Assertions.assertEquals(MqttVersion.V3_1_1, this.iotProperties.mqtt.version)
+        Assertions.assertTrue(this.iotProperties.mqtt.version in arrayOf(MqttVersion.V3_1_1, MqttVersion.V5_0))
     }
 }
