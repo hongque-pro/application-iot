@@ -56,7 +56,7 @@
         },
         {
           "value": "3.1.1",
-          "description": "mqtt version 5.0."
+          "description": "mqtt version 3.1.1"
         }
       ]
     }
