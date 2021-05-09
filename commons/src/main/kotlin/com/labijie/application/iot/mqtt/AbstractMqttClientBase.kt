@@ -9,6 +9,7 @@ import com.labijie.application.iot.LoopList
 import com.labijie.application.iot.configuration.MqttProperties
 import com.labijie.application.iot.exception.MqttClientConnectTimeoutException
 import com.labijie.application.iot.exception.MqttClientException
+import com.labijie.infra.collections.ConcurrentHashSet
 import com.labijie.infra.spring.configuration.NetworkConfig
 import com.labijie.infra.utils.ifNullOrBlank
 import com.labijie.infra.utils.throwIfNecessary
@@ -16,7 +17,11 @@ import org.slf4j.LoggerFactory
 import java.time.Duration
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Semaphore
+import java.util.concurrent.locks.ReadWriteLock
+import java.util.concurrent.locks.ReentrantReadWriteLock
+import kotlin.concurrent.read
 import kotlin.concurrent.thread
+import kotlin.concurrent.write
 
 abstract class AbstractMqttClientBase<T : MqttClient>(
     protected val networkConfig: NetworkConfig,
@@ -28,6 +33,9 @@ abstract class AbstractMqttClientBase<T : MqttClient>(
     private var stopped: Boolean = false
 
     private val connectSemaphore = Semaphore(1)
+
+    private val subscribers = ConcurrentHashSet<ISubscriber>()
+    private val subscribersLock = ReentrantReadWriteLock()
 
     private var client: T? = null
 
@@ -88,18 +96,16 @@ abstract class AbstractMqttClientBase<T : MqttClient>(
                             logger.error("connect verneMQ broker$endpoint fault.", e)
 
                         }
-                        if((System.currentTimeMillis() - startTime) > timeoutMills){
+                        if ((System.currentTimeMillis() - startTime) > timeoutMills) {
                             throw MqttClientConnectTimeoutException()
                         }
 
                         Thread.sleep(Duration.ofSeconds(retryIntervalSeconds).toMillis())
                     }
                     f.complete(null)
-                }
-                catch (throwable: Throwable){
+                } catch (throwable: Throwable) {
                     f.completeExceptionally(throwable)
-                }
-                finally {
+                } finally {
                     connectSemaphore.release()
                 }
             }
@@ -118,9 +124,34 @@ abstract class AbstractMqttClientBase<T : MqttClient>(
         } else {
             val c = buildMqttClient(it, listener)
             connect(c)
-            logger.info("Connect to mqtt broker '${it.host.ifNullOrBlank { "<unknown>" }}' succeed.")
-            this.client = c
-            c
+
+            subscribersLock.write {
+                val f = CompletableFuture.allOf(
+                    *this.subscribers.map {
+                        sub(c, it)
+                    }.toTypedArray()
+                )
+                try {
+                    f.get()
+                } catch (e: Exception) {
+                    logger.error("resubscribe mqtt topic fault.", e)
+                    disconnectIgnoreError(c)
+                    return null
+                }
+
+                logger.info("Connect to mqtt broker '${it.host.ifNullOrBlank { "<unknown>" }}' succeed.")
+                this.client = c
+                c
+            }
+        }
+    }
+
+    private fun disconnectIgnoreError(client: T) {
+        try {
+            disconnect(client)
+        } catch (e: Exception) {
+            e.throwIfNecessary()
+            logger.warn("disconnect mqtt client fault", e)
         }
     }
 
@@ -134,7 +165,7 @@ abstract class AbstractMqttClientBase<T : MqttClient>(
             .serverPort(listener.port)
 //            .automaticReconnectWithDefaultConfig()
             .addDisconnectedListener(SwitchNodeListener(this))
-            .identifier("iot_svr_${networkConfig.getIPAddress()}")
+            .identifier("iot_lib_${networkConfig.getIPAddress().replace(".", "_")}")
         return onBuildMqttClient(builder)
 
     }
@@ -156,12 +187,32 @@ abstract class AbstractMqttClientBase<T : MqttClient>(
         return c
     }
 
-    final override fun pushMessage(topic: String, payload: ByteArray, qos: MqttQos): CompletableFuture<Void> {
-        val c = this.mustConnected()
-        return this.publish(c, topic, payload, qos)
+    final override fun subscribe(subscriber: ISubscriber): CompletableFuture<Void> {
+        subscribersLock.read {
+            if (subscribers.add(subscriber)) {
+                val c = this.client
+                if (!this.stopped && c != null && c.state == MqttClientState.CONNECTED) {
+                    return sub(c, subscriber)
+                        .whenComplete { _, u ->
+                            if (u != null) {
+                                subscribers.remove(subscriber)
+                            }else{
+                                logger.info("Mqtt topic '${subscriber.topicFilter}' subscribed.")
+                            }
+                        }
+                }
+            }
+            return CompletableFuture.supplyAsync { null }
+        }
     }
 
-    protected abstract fun publish(client: T, topic: String, payload: ByteArray, qos: MqttQos) : CompletableFuture<Void>
+    final override fun pushMessage(topic: String, payload: ByteArray, qos: MqttQos): CompletableFuture<Void> {
+        val c = this.mustConnected()
+        return this.pub(c, topic, payload, qos)
+    }
+
+    protected abstract fun pub(client: T, topic: String, payload: ByteArray, qos: MqttQos): CompletableFuture<Void>
+    protected abstract fun sub(client: T, subscriber: ISubscriber): CompletableFuture<Void>
 
     override fun close() {
         this.disconnect()

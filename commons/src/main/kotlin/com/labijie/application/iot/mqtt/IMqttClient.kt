@@ -10,4 +10,5 @@ interface IMqttClient {
     fun disconnect()
     fun getClusterNodes(): List<MqttNode>
     fun pushMessage(topic: String, payload: ByteArray, qos: MqttQos = MqttQos.AT_MOST_ONCE): CompletableFuture<Void>
+    fun subscribe(subscriber: ISubscriber): CompletableFuture<Void>
 }

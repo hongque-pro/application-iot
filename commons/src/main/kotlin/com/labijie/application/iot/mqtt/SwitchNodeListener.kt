@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory
 import java.time.Duration
 import java.util.concurrent.ThreadLocalRandom
 import java.util.concurrent.TimeUnit
+import kotlin.math.pow
 
 internal class SwitchNodeListener<T : MqttClient>(
     private val client: AbstractMqttClientBase<T>
@@ -31,8 +32,7 @@ internal class SwitchNodeListener<T : MqttClient>(
             return
         }
 
-        val delay = Math.min(
-            DEFAULT_START_DELAY_NANOS * Math.pow(2.0, context.reconnector.attempts.toDouble()),
+        val delay = (DEFAULT_START_DELAY_NANOS * 2.0.pow(context.reconnector.attempts.toDouble())).coerceAtMost(
             DEFAULT_MAX_DELAY_NANOS.toDouble()
         ).toLong()
 

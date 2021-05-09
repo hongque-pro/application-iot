@@ -13,6 +13,26 @@
       "defaultValue": "5.0"
     },
     {
+      "name": "application.iot.mqtt.keep-alive",
+      "defaultValue": "1m"
+    },
+    {
+      "name": "application.iot.mqtt.v3.clean-session",
+      "defaultValue": true
+    },
+    {
+      "name": "application.iot.mqtt.v5.will-message",
+      "defaultValue": true
+    },
+    {
+      "name": "application.iot.mqtt.v5.clean-start",
+      "defaultValue": true
+    },
+    {
+      "name": "application.iot.mqtt.v5.session-expiry-interval",
+      "defaultValue": 0
+    },
+    {
       "name": "application.iot.mqtt.vernemq.http-url",
       "defaultValue": "http://localhost:8888"
     }
