@@ -14,6 +14,7 @@ import com.labijie.infra.spring.configuration.NetworkConfig
 import com.labijie.infra.utils.ifNullOrBlank
 import com.labijie.infra.utils.throwIfNecessary
 import org.slf4j.LoggerFactory
+import java.lang.IllegalArgumentException
 import java.time.Duration
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Semaphore
@@ -188,6 +189,11 @@ abstract class AbstractMqttClientBase<T : MqttClient>(
     }
 
     final override fun subscribe(subscriber: ISubscriber): CompletableFuture<Void> {
+        if(subscriber.topicFilter.isBlank()){
+            return CompletableFuture<Void>().apply {
+                this.completeExceptionally(IllegalArgumentException("ISubscriber.topicFilter can't be empty."))
+            }
+        }
         subscribersLock.read {
             if (subscribers.add(subscriber)) {
                 val c = this.client
@@ -206,7 +212,13 @@ abstract class AbstractMqttClientBase<T : MqttClient>(
         }
     }
 
-    final override fun pushMessage(topic: String, payload: ByteArray, qos: MqttQos): CompletableFuture<Void> {
+    final override fun publish(topic: String, payload: ByteArray, qos: MqttQos): CompletableFuture<Void> {
+        if(topic.isBlank()){
+            return CompletableFuture<Void>().apply {
+                this.completeExceptionally(IllegalArgumentException("publish topic can't be empty."))
+            }
+        }
+
         val c = this.mustConnected()
         return this.pub(c, topic, payload, qos)
     }

@@ -1,14 +1,11 @@
 package com.labijie.application.io.testing
 
 import com.labijie.application.iot.exception.MqttClientConnectionException
-import com.labijie.application.iot.exception.MqttClientException
 import com.labijie.application.iot.mqtt.subscribe
 import com.labijie.application.iot.mqtt.vernmq.VerneMQV5Client
 import com.labijie.infra.spring.configuration.NetworkConfig
 import com.labijie.infra.utils.recurseCause
-import okhttp3.internal.wait
 import org.junit.jupiter.api.Assertions
-import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.boot.web.client.RestTemplateBuilder
 import java.time.Duration
 import java.util.concurrent.ExecutionException
@@ -59,7 +56,7 @@ class VerneMQV5ClientTester {
         createMQV5Client().use {
             try {
                 it.connect(Duration.ofSeconds(5)).get()
-                it.pushMessage("/test", "test-message".toByteArray(Charsets.UTF_8)).get()
+                it.publish("/test", "test-message".toByteArray(Charsets.UTF_8)).get()
 
             } catch (e: ExecutionException) {
                 val ex = e.recurseCause(MqttClientConnectionException::class)
@@ -85,7 +82,7 @@ class VerneMQV5ClientTester {
                     receivedData = data.toString(Charsets.UTF_8)
                 }
                 it.connect(Duration.ofSeconds(5)).get()
-                it.pushMessage(sendTopic, sendData.toByteArray(Charsets.UTF_8)).get()
+                it.publish(sendTopic, sendData.toByteArray(Charsets.UTF_8)).get()
 
                 s.tryAcquire(3, TimeUnit.SECONDS)
 

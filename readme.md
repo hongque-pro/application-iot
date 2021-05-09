@@ -29,7 +29,7 @@ application:
       version: 5.0
       keep-alive: 1m
       vernemq:
-        http-url: http://localhost:8888
+        http-url: http://192.168.1.10:8888, http://192.168.1.11:8888, http://192.168.1.12:8888
         api-key: XXXXXXXXX
 ```
 
@@ -41,7 +41,7 @@ interface IMqttClient {
     fun connect(timeout: Duration? = null): CompletableFuture<Void>
     fun disconnect()
     fun getClusterNodes(): List<MqttNode>
-    fun pushMessage(topic: String, payload: ByteArray, qos: MqttQos = MqttQos.AT_MOST_ONCE): CompletableFuture<Void>
+    fun publish(topic: String, payload: ByteArray, qos: MqttQos = MqttQos.AT_MOST_ONCE): CompletableFuture<Void>
     fun subscribe(subscriber: ISubscriber): CompletableFuture<Void>
 }
 ```
