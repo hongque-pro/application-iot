@@ -1,11 +1,10 @@
 package com.labijie.application.iot.mqtt.vernmq
 
 import com.hivemq.client.mqtt.MqttClientBuilder
-import com.hivemq.client.mqtt.datatypes.MqttQos
 import com.hivemq.client.mqtt.mqtt3.Mqtt3BlockingClient
 import com.hivemq.client.mqtt.mqtt3.message.connect.Mqtt3Connect
 import com.hivemq.client.mqtt.mqtt3.message.publish.Mqtt3Publish
-import com.hivemq.client.mqtt.mqtt5.message.connect.Mqtt5Connect
+import com.labijie.application.iot.IotMqttQos
 import com.labijie.application.iot.configuration.MqttProperties
 import com.labijie.application.iot.exception.MqttClientException
 import com.labijie.application.iot.mqtt.ISubscriber
@@ -33,13 +32,13 @@ class VerneMQV3Client(networkConfig: NetworkConfig, serverProperties: MqttProper
         client.connect(c)
     }
 
-    override fun pub(client: Mqtt3BlockingClient, topic: String, payload: ByteArray, qos: MqttQos): CompletableFuture<Void> {
+    override fun pub(client: Mqtt3BlockingClient, topic: String, payload: ByteArray, qos: IotMqttQos): CompletableFuture<Void> {
         val future = CompletableFuture<Void>()
 
         client.toAsync().publishWith()
             .topic(topic)
             .payload(payload)
-            .qos(qos)
+            .qos(qos.toMqttQos())
             .send().whenComplete { _, throwable ->
                 if (throwable != null) {
                     future.completeExceptionally(throwable)

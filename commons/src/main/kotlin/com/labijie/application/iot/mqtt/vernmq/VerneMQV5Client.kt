@@ -1,14 +1,13 @@
 package com.labijie.application.iot.mqtt.vernmq
 
 import com.hivemq.client.mqtt.MqttClientBuilder
-import com.hivemq.client.mqtt.datatypes.MqttQos
 import com.hivemq.client.mqtt.mqtt5.Mqtt5BlockingClient
-import com.hivemq.client.mqtt.mqtt5.message.Mqtt5ReasonCode
 import com.hivemq.client.mqtt.mqtt5.message.connect.Mqtt5Connect
 import com.hivemq.client.mqtt.mqtt5.message.connect.Mqtt5Connect.NO_SESSION_EXPIRY
 import com.hivemq.client.mqtt.mqtt5.message.disconnect.Mqtt5Disconnect
 import com.hivemq.client.mqtt.mqtt5.message.disconnect.Mqtt5DisconnectReasonCode
 import com.hivemq.client.mqtt.mqtt5.message.publish.Mqtt5Publish
+import com.labijie.application.iot.IotMqttQos
 import com.labijie.application.iot.configuration.MqttProperties
 import com.labijie.application.iot.exception.MqttClientException
 import com.labijie.application.iot.mqtt.ISubscriber
@@ -49,14 +48,14 @@ class VerneMQV5Client(networkConfig: NetworkConfig, serverProperties: MqttProper
         client: Mqtt5BlockingClient,
         topic: String,
         payload: ByteArray,
-        qos: MqttQos
+        qos: IotMqttQos
     ): CompletableFuture<Void> {
         val future = CompletableFuture<Void>()
 
         client.toAsync().publishWith()
             .topic(topic)
             .payload(payload)
-            .qos(qos)
+            .qos(qos.toMqttQos())
             .send().whenComplete { _, throwable ->
                 if (throwable != null) {
                     future.completeExceptionally(

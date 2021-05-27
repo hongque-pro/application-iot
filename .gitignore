@@ -24,6 +24,7 @@ Thumbs.db
 
 # build dir
 .gradle/
+gradlew*
 build/
 target/
 bin/

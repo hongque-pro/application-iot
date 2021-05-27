@@ -15,7 +15,7 @@ import org.springframework.web.client.RestTemplate
 
 @Configuration(proxyBeanMethods = false)
 @AutoConfigureAfter(ApplicationCoreAutoConfiguration::class, IotCommonsAutoConfiguration::class)
-@ConditionalOnProperty(prefix = IotProperties.MQTT_PROPERTIES_PREFIX, name = ["enabled"], havingValue = "true", matchIfMissing = false)
+@ConditionalOnProperty(prefix = IotProperties.MQTT_PROPERTIES_PREFIX, name = ["enabled"], havingValue = "true", matchIfMissing = true)
 class MQTTAutoConfiguration {
 
     @Configuration(proxyBeanMethods = false)

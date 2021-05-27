@@ -3,7 +3,7 @@ package com.labijie.application.iot.mqtt
 import com.hivemq.client.mqtt.MqttClient
 import com.hivemq.client.mqtt.MqttClientBuilder
 import com.hivemq.client.mqtt.MqttClientState
-import com.hivemq.client.mqtt.datatypes.MqttQos
+import com.labijie.application.iot.IotMqttQos
 import com.labijie.application.iot.IotUtils
 import com.labijie.application.iot.LoopList
 import com.labijie.application.iot.configuration.MqttProperties
@@ -18,7 +18,6 @@ import java.lang.IllegalArgumentException
 import java.time.Duration
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Semaphore
-import java.util.concurrent.locks.ReadWriteLock
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.concurrent.read
 import kotlin.concurrent.thread
@@ -212,7 +211,7 @@ abstract class AbstractMqttClientBase<T : MqttClient>(
         }
     }
 
-    final override fun publish(topic: String, payload: ByteArray, qos: MqttQos): CompletableFuture<Void> {
+    final override fun publish(topic: String, payload: ByteArray, qos: IotMqttQos): CompletableFuture<Void> {
         if(topic.isBlank()){
             return CompletableFuture<Void>().apply {
                 this.completeExceptionally(IllegalArgumentException("publish topic can't be empty."))
@@ -223,7 +222,7 @@ abstract class AbstractMqttClientBase<T : MqttClient>(
         return this.pub(c, topic, payload, qos)
     }
 
-    protected abstract fun pub(client: T, topic: String, payload: ByteArray, qos: MqttQos): CompletableFuture<Void>
+    protected abstract fun pub(client: T, topic: String, payload: ByteArray, qos: IotMqttQos): CompletableFuture<Void>
     protected abstract fun sub(client: T, subscriber: ISubscriber): CompletableFuture<Void>
 
     override fun close() {
